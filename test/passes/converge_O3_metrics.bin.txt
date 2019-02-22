@@ -3,21 +3,21 @@ total
  [imports]      : 3       
  [memory-data]  : 28      
  [table-data]   : 429     
- [total]        : 132     
+ [total]        : 129     
  [vars]         : 4       
- binary         : 12      
+ binary         : 11      
  block          : 8       
  break          : 3       
  call           : 3       
  call_indirect  : 4       
- const          : 47      
+ const          : 46      
  drop           : 3       
  global.get     : 1       
  global.set     : 1       
  if             : 3       
  load           : 16      
  local.get      : 18      
- local.set      : 7       
+ local.set      : 6       
  loop           : 1       
  store          : 5       
 (module
@@ -113,12 +113,7 @@ total
       )
      )
     )
-    (local.tee $0
-     (i32.sub
-      (local.get $0)
-      (i32.const 10888)
-     )
-    )
+    (local.get $0)
    )
    (block $label$2
     (br_if $label$2
@@ -244,21 +239,21 @@ total
  [imports]      : 3       
  [memory-data]  : 28      
  [table-data]   : 429     
- [total]        : 132     
+ [total]        : 129     
  [vars]         : 4       
- binary         : 12      
+ binary         : 11      
  block          : 8       
  break          : 3       
  call           : 3       
  call_indirect  : 4       
- const          : 47      
+ const          : 46      
  drop           : 3       
  global.get     : 1       
  global.set     : 1       
  if             : 3       
  load           : 16      
  local.get      : 18      
- local.set      : 7       
+ local.set      : 6       
  loop           : 1       
  store          : 5       
 (module
@@ -355,12 +350,7 @@ total
       )
      )
     )
-    (local.tee $0
-     (i32.sub
-      (local.get $0)
-      (i32.const 10888)
-     )
-    )
+    (local.get $0)
    )
    (block $label$2
     (br_if $label$2
@@ -486,21 +476,21 @@ total
  [imports]      : 3       
  [memory-data]  : 28      
  [table-data]   : 429     
- [total]        : 132     
+ [total]        : 129     
  [vars]         : 4       
- binary         : 12      
+ binary         : 11      
  block          : 8       
  break          : 3       
  call           : 3       
  call_indirect  : 4       
- const          : 47      
+ const          : 46      
  drop           : 3       
  global.get     : 1       
  global.set     : 1       
  if             : 3       
  load           : 16      
  local.get      : 18      
- local.set      : 7       
+ local.set      : 6       
  loop           : 1       
  store          : 5       
 (module
@@ -597,12 +587,7 @@ total
       )
      )
     )
-    (local.tee $0
-     (i32.sub
-      (local.get $0)
-      (i32.const 10888)
-     )
-    )
+    (local.get $0)
    )
    (block $label$2
     (br_if $label$2

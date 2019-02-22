@@ -78,6 +78,7 @@ void PassRegistry::registerPasses() {
   registerPass("dfo", "optimizes using the DataFlow SSA IR", createDataFlowOptsPass);
   registerPass("duplicate-function-elimination", "removes duplicate functions", createDuplicateFunctionEliminationPass);
   registerPass("extract-function", "leaves just one function (useful for debugging)", createExtractFunctionPass);
+  registerPass("eac", "expand added constants", createExpandAddedConstantsPass);
   registerPass("flatten", "flattens out code, removing nesting", createFlattenPass);
   registerPass("fpcast-emu", "emulates function pointer casts, allowing incorrect indirect calls to (sometimes) work", createFuncCastEmulationPass);
   registerPass("func-metrics", "reports function metrics", createFunctionMetricsPass);
@@ -164,6 +165,9 @@ void PassRunner::addDefaultFunctionOptimizationPasses() {
   add("optimize-instructions");
   if (options.optimizeLevel >= 2 || options.shrinkLevel >= 2) {
     add("pick-load-signs");
+  }
+  if (options.optimizeLevel >= 3 && options.shrinkLevel == 0) {
+    add("eac");
   }
   // early propagation
   if (options.optimizeLevel >= 3 || options.shrinkLevel >= 2) {

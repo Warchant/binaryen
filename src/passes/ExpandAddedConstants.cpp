@@ -1,0 +1,93 @@
+/*
+ * Copyright 2019 WebAssembly Community Group participants
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+//
+// Expand added constants. E.g., consider
+//
+//  x = y + 10
+//  z = x + 20
+//  w = x + 30
+//
+// By expanding out x, we can merge those constants, and this is a pretty common
+// pattern. In particular, often big interpreter loops end up having many such
+// constant offsets that they care about, and keeping those alive across the
+// entire big function is not worthwhile.
+
+#include "wasm.h"
+#include "pass.h"
+#include "wasm-builder.h"
+#include "ir/local-graph.h"
+#include "ir/utils.h"
+
+namespace wasm {
+
+/*
+// Don't do this on small functions,
+static const Index MINIMUM_LOCALS = 20;
+static const Index MINIMUM_SIZE = 100;
+*/
+
+struct ExpandAddedConstants : public WalkerPass<PostWalker<ExpandAddedConstants>> {
+  bool isFunctionParallel() override { return true; }
+
+  Pass* create() override { return new ExpandAddedConstants; }
+
+  void doWalkFunction(Function* func) {
+/*
+    if (func->getNumLocals() < MINIMUM_LOCALS ||
+        Measurer::measure(func->body) < MINIMUM_SIZE) {
+      return;
+    }
+*/
+    Builder builder(*getModule());
+    LocalGraph localGraph(func);
+    for (auto& pair : localGraph.getSetses) {
+      auto* get = pair.first;
+      auto& sets = pair.second;
+      if (sets.size() == 1) {
+        if (auto* set = *sets.begin()) {
+          auto* value = set->value;
+          if (auto* binary = value->dynCast<Binary>()) {
+            if (binary->op == AddInt32) {
+              if (auto* parentGet = binary->left->dynCast<GetLocal>()) {
+                // The parent get must not be changed in between.
+                if (localGraph.getSetses[parentGet].size() == 1) {
+                  // It's enough to check for a constant on the right, since optimize-instructions
+                  // canonicalizes that way.
+                  if (auto* c = binary->right->dynCast<Const>()) {
+                    // Great, expand it out.
+                    *localGraph.locations[get] = builder.makeBinary(
+                      AddInt32,
+                      builder.makeGetLocal(parentGet->index, parentGet->type),
+                      builder.makeConst(c->value)
+                    );
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+};
+
+Pass *createExpandAddedConstantsPass() {
+  return new ExpandAddedConstants();
+}
+
+} // namespace wasm

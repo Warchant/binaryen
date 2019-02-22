@@ -13,6 +13,7 @@ SET(passes_SOURCES
   DeadArgumentElimination.cpp
   DeadCodeElimination.cpp
   DuplicateFunctionElimination.cpp
+  ExpandAddedConstants.cpp
   ExtractFunction.cpp
   Flatten.cpp
   FuncCastEmulation.cpp
