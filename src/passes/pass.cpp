@@ -227,7 +227,7 @@ void PassRunner::addDefaultGlobalOptimizationPostPasses() {
   }
   // Perform EAC after everything else that optimizes code.
   if (options.optimizeLevel >= 3 && options.shrinkLevel == 0) {
-    add("eac");
+    add("eac-optimizing");
   }
   add("duplicate-function-elimination"); // optimizations show more functions as duplicate
   add("remove-unused-module-elements");
