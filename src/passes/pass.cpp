@@ -79,6 +79,7 @@ void PassRegistry::registerPasses() {
   registerPass("duplicate-function-elimination", "removes duplicate functions", createDuplicateFunctionEliminationPass);
   registerPass("extract-function", "leaves just one function (useful for debugging)", createExtractFunctionPass);
   registerPass("eac", "expand added constants", createExpandAddedConstantsPass);
+  registerPass("eac-optimizing", "expand added constants, and optimize where successful", createExpandAddedConstantsOptimizingPass);
   registerPass("flatten", "flattens out code, removing nesting", createFlattenPass);
   registerPass("fpcast-emu", "emulates function pointer casts, allowing incorrect indirect calls to (sometimes) work", createFuncCastEmulationPass);
   registerPass("func-metrics", "reports function metrics", createFunctionMetricsPass);

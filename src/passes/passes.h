@@ -33,6 +33,7 @@ Pass* createDataFlowOptsPass();
 Pass* createDeadCodeEliminationPass();
 Pass* createDuplicateFunctionEliminationPass();
 Pass* createExpandAddedConstantsPass();
+Pass* createExpandAddedConstantsOptimizingPass();
 Pass* createExtractFunctionPass();
 Pass* createFlattenPass();
 Pass* createFuncCastEmulationPass();

@@ -26,6 +26,11 @@
 // pattern. In particular, often big interpreter loops end up having many such
 // constant offsets that they care about, and keeping those alive across the
 // entire big function is not worthwhile.
+//
+// Running this after all other optimizations is worthwhile, to see if extra
+// added constants like these are optimized away otherhow. In other words, this
+// is a good last resort. As such, it will optimize if it made any changes.
+//
 
 #include "wasm.h"
 #include "pass.h"
@@ -36,20 +41,25 @@ namespace wasm {
 
 // Don't do this on small numbers of locals - the main benefit is when we can remove
 // an excessive number of temp locals with long lifetimes.
-static const Index MINIMUM_LOCALS = 100;
+//////////////////////static const Index MINIMUM_LOCALS = 100;
 
 struct ExpandAddedConstants : public WalkerPass<PostWalker<ExpandAddedConstants>> {
   bool isFunctionParallel() override { return true; }
 
-  Pass* create() override { return new ExpandAddedConstants; }
+  Pass* create() override { return new ExpandAddedConstants(optimizing); }
+
+  bool optimizing;
+
+  ExpandAddedConstants(bool optimizing) : optimizing(optimizing) {}
 
   void doWalkFunction(Function* func) {
-    if (func->getNumLocals() < MINIMUM_LOCALS) {
-      return;
-    }
+  //  if (func->getNumLocals() < MINIMUM_LOCALS) {
+ //     return;
+//    }
 if (getenv("SKIP")) return;
     Builder builder(*getModule());
     LocalGraph localGraph(func);
+    bool changed = false;
     for (auto& pair : localGraph.getSetses) {
       auto* get = pair.first;
       auto& sets = pair.second;
@@ -70,6 +80,7 @@ if (getenv("SKIP")) return;
                     builder.makeGetLocal(temp, parentGet->type),
                     builder.makeConst(c->value)
                   );
+                  changed = true;
                 }
               }
             }
@@ -77,11 +88,21 @@ if (getenv("SKIP")) return;
         }
       }
     }
+    if (optimizing && changed) {
+      PassRunner runner(getModule(), getPassOptions());
+      runner.setIsNested(true);
+      runner.addDefaultFunctionOptimizationPasses();
+      runner.runOnFunction(func);
+    }
   }
 };
 
 Pass *createExpandAddedConstantsPass() {
-  return new ExpandAddedConstants();
+  return new ExpandAddedConstants(false);
+}
+
+Pass *createExpandAddedConstantsOptimizingPass() {
+  return new ExpandAddedConstants(true);
 }
 
 } // namespace wasm
