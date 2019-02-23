@@ -3,8 +3,8 @@ total
  [imports]      : 3       
  [memory-data]  : 28      
  [table-data]   : 429     
- [total]        : 133     
- [vars]         : 5       
+ [total]        : 132     
+ [vars]         : 4       
  binary         : 12      
  block          : 8       
  break          : 3       
@@ -17,7 +17,7 @@ total
  if             : 3       
  load           : 16      
  local.get      : 18      
- local.set      : 8       
+ local.set      : 7       
  loop           : 1       
  store          : 5       
 (module
@@ -81,7 +81,6 @@ total
  (func $_main (; 4 ;) (; has Stack IR ;) (type $7) (result i32)
   (local $0 i32)
   (local $1 i32)
-  (local $2 i32)
   (local.set $1
    (i32.load offset=24
     (i32.add
@@ -107,9 +106,7 @@ total
       (i32.load8_s
        (local.tee $0
         (i32.add
-         (local.tee $2
-          (local.get $0)
-         )
+         (local.get $0)
          (i32.const 1)
         )
        )
@@ -117,9 +114,9 @@ total
      )
     )
     (local.tee $0
-     (i32.add
-      (local.get $2)
-      (i32.const -10887)
+     (i32.sub
+      (local.get $0)
+      (i32.const 10888)
      )
     )
    )
@@ -247,21 +244,21 @@ total
  [imports]      : 3       
  [memory-data]  : 28      
  [table-data]   : 429     
- [total]        : 134           +1
- [vars]         : 5       
- binary         : 13            +1
+ [total]        : 132     
+ [vars]         : 4       
+ binary         : 12      
  block          : 8       
  break          : 3       
  call           : 3       
  call_indirect  : 4       
- const          : 48            +1
+ const          : 47      
  drop           : 3       
  global.get     : 1       
  global.set     : 1       
  if             : 3       
  load           : 16      
  local.get      : 18      
- local.set      : 7             -1
+ local.set      : 7       
  loop           : 1       
  store          : 5       
 (module
@@ -326,8 +323,7 @@ total
  (func $_main (; 4 ;) (; has Stack IR ;) (type $7) (result i32)
   (local $0 i32)
   (local $1 i32)
-  (local $2 i32)
-  (local.set $0
+  (local.set $1
    (i32.load offset=24
     (i32.add
      (i32.load
@@ -344,41 +340,38 @@ total
   )
   (if
    (block (result i32)
-    (local.set $1
+    (local.set $0
      (i32.const 10888)
     )
     (loop $label$3
      (br_if $label$3
       (i32.load8_s
-       (local.tee $1
+       (local.tee $0
         (i32.add
-         (local.tee $2
-          (local.get $1)
-         )
+         (local.get $0)
          (i32.const 1)
         )
        )
       )
      )
     )
-    (i32.add
-     (local.get $2)
-     (i32.const -10887)
+    (local.tee $0
+     (i32.sub
+      (local.get $0)
+      (i32.const 10888)
+     )
     )
    )
    (block $label$2
     (br_if $label$2
      (call_indirect (type $1)
-      (local.get $0)
+      (local.get $1)
       (i32.const 10888)
-      (i32.add
-       (local.get $2)
-       (i32.const -10887)
-      )
+      (local.get $0)
       (i32.add
        (i32.load offset=48
         (i32.load
-         (local.get $0)
+         (local.get $1)
         )
        )
        (i32.const 8)
@@ -493,14 +486,14 @@ total
  [imports]      : 3       
  [memory-data]  : 28      
  [table-data]   : 429     
- [total]        : 134     
- [vars]         : 5       
- binary         : 13      
+ [total]        : 132     
+ [vars]         : 4       
+ binary         : 12      
  block          : 8       
  break          : 3       
  call           : 3       
  call_indirect  : 4       
- const          : 48      
+ const          : 47      
  drop           : 3       
  global.get     : 1       
  global.set     : 1       
@@ -572,8 +565,7 @@ total
  (func $_main (; 4 ;) (; has Stack IR ;) (type $7) (result i32)
   (local $0 i32)
   (local $1 i32)
-  (local $2 i32)
-  (local.set $0
+  (local.set $1
    (i32.load offset=24
     (i32.add
      (i32.load
@@ -590,41 +582,38 @@ total
   )
   (if
    (block (result i32)
-    (local.set $1
+    (local.set $0
      (i32.const 10888)
     )
     (loop $label$3
      (br_if $label$3
       (i32.load8_s
-       (local.tee $1
+       (local.tee $0
         (i32.add
-         (local.tee $2
-          (local.get $1)
-         )
+         (local.get $0)
          (i32.const 1)
         )
        )
       )
      )
     )
-    (i32.add
-     (local.get $2)
-     (i32.const -10887)
+    (local.tee $0
+     (i32.sub
+      (local.get $0)
+      (i32.const 10888)
+     )
     )
    )
    (block $label$2
     (br_if $label$2
      (call_indirect (type $1)
-      (local.get $0)
+      (local.get $1)
       (i32.const 10888)
-      (i32.add
-       (local.get $2)
-       (i32.const -10887)
-      )
+      (local.get $0)
       (i32.add
        (i32.load offset=48
         (i32.load
-         (local.get $0)
+         (local.get $1)
         )
        )
        (i32.const 8)

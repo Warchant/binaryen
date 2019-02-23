@@ -59,28 +59,34 @@ struct ExpandAddedConstants : public WalkerPass<PostWalker<ExpandAddedConstants>
 if (getenv("SKIP")) return;
     Builder builder(*getModule());
     LocalGraph localGraph(func);
+    // Find which locals have a single set. This is generally what we care about anyhow,
+    // as in a big interpreter loop the local will live across the entire function. This
+    // also makes it much easier to know that this is safe to do (the parent local is not
+    // assigned to in the middle).
+    auto safeIndexes = localGraph.getSSAIndexes();
+    // Main loop.
     bool changed = false;
     for (auto& pair : localGraph.getSetses) {
       auto* get = pair.first;
-      auto& sets = pair.second;
-      if (sets.size() == 1) {
-        if (auto* set = *sets.begin()) {
-          auto* value = set->value;
-          if (auto* binary = value->dynCast<Binary>()) {
-            if (binary->op == AddInt32) {
-              if (auto* parentGet = binary->left->dynCast<GetLocal>()) {
-                // It's enough to check for a constant on the right, since optimize-instructions
-                // canonicalizes that way.
-                if (auto* c = binary->right->dynCast<Const>()) {
-                  // Great, expand it out. Use a new temp local, which will be optimized away later.
-                  auto temp = Builder::addVar(func, parentGet->type);
-                  binary->left = builder.makeTeeLocal(temp, binary->left);
-                  *localGraph.locations[get] = builder.makeBinary(
-                    AddInt32,
-                    builder.makeGetLocal(temp, parentGet->type),
-                    builder.makeConst(c->value)
-                  );
-                  changed = true;
+      if (safeIndexes.count(get->index)) {
+        auto& sets = pair.second;
+        if (sets.size() == 1) {
+          if (auto* set = *sets.begin()) {
+            auto* value = set->value;
+            if (auto* binary = value->dynCast<Binary>()) {
+              if (binary->op == AddInt32) {
+                if (auto* parentGet = binary->left->dynCast<GetLocal>()) {
+                  // It's enough to check for a constant on the right, since optimize-instructions
+                  // canonicalizes that way.
+                  if (auto* c = binary->right->dynCast<Const>()) {
+                    // Great, expand it out.
+                    *localGraph.locations[get] = builder.makeBinary(
+                      AddInt32,
+                      builder.makeGetLocal(parentGet->index, parentGet->type),
+                      builder.makeConst(c->value)
+                    );
+                    changed = true;
+                  }
                 }
               }
             }

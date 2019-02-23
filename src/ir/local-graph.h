@@ -45,6 +45,9 @@ struct LocalGraph {
                        // value (0 for a var, the received value for a param)
   Locations locations; // where each get and set is (for easy replacing)
 
+  // Get the local indexes that are SSA - have a single set for all the gets.
+  std::set<Index> getSSAIndexes();
+
   // optional computation: compute the influence graphs between sets and gets
   // (useful for algorithms that propagate changes)
 

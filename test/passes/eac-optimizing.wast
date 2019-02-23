@@ -1,6 +1,5 @@
 (module
- (type $0 (func (param i32)))
- (func $good (; 0 ;) (type $0) (param $x0 i32)
+ (func $good (param $x0 i32)
   (local $x1 i32)
   (local.set $x1
    (i32.add
@@ -9,19 +8,13 @@
    )
   )
   (drop
-   (i32.add
-    (local.get $x0)
-    (i32.const 28)
-   )
+   (local.get $x1)
   )
   (drop
-   (i32.add
-    (local.get $x0)
-    (i32.const 28)
-   )
+   (local.get $x1)
   )
  )
- (func $tricky (; 1 ;) (type $0) (param $x0 i32)
+ (func $tricky (param $x0 i32)
   (local $x1 i32)
   (local.set $x1
    (i32.add
@@ -42,10 +35,9 @@
    (local.get $x1)
   )
  )
- (func $bad (; 2 ;) (type $0) (param $x0 i32)
+ (func $bad (param $x0 i32)
   (local $x1 i32)
-  (if
-   (i32.const 0)
+  (if (i32.const 0)
    (local.set $x1
     (i32.add
      (local.get $x0)
@@ -61,3 +53,4 @@
   )
  )
 )
+

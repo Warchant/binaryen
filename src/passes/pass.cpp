@@ -179,9 +179,6 @@ void PassRunner::addDefaultFunctionOptimizationPasses() {
   add("simplify-locals-nostructure"); // don't create if/block return values yet, as coalesce can remove copies that that could inhibit
   add("vacuum"); // previous pass creates garbage
   add("reorder-locals");
-  if (options.optimizeLevel >= 3 && options.shrinkLevel == 0) {
-    add("eac");
-  }
   add("remove-unused-brs"); // simplify-locals opens opportunities for optimizations
   // if we are willing to work hard, also optimize copies before coalescing
   if (options.optimizeLevel >= 3 || options.shrinkLevel >= 2) {
@@ -222,17 +219,21 @@ void PassRunner::addDefaultGlobalOptimizationPostPasses() {
   if (options.optimizeLevel >= 2 || options.shrinkLevel >= 1) {
     add("dae-optimizing");
   }
-  // inline when working hard, and when not preserving debug info
-  // (inlining+optimizing can remove the annotations)
+  // Inline when working hard, and when not preserving debug info
+  // (inlining+optimizing can remove the annotations).
   if ((options.optimizeLevel >= 2 || options.shrinkLevel >= 2) &&
       !options.debugInfo) {
     add("inlining-optimizing");
   }
+  // Perform EAC after everything else that optimizes code.
+  if (options.optimizeLevel >= 3 && options.shrinkLevel == 0) {
+    add("eac");
+  }
   add("duplicate-function-elimination"); // optimizations show more functions as duplicate
   add("remove-unused-module-elements");
   add("memory-packing");
-  // perform Stack IR optimizations here, at the very end of the
-  // optimization pipeline
+  // Perform Stack IR optimizations here, at the very end of the
+  // optimization pipeline.
   if (options.optimizeLevel >= 2 || options.shrinkLevel >= 1) {
     add("generate-stack-ir");
     add("optimize-stack-ir");
