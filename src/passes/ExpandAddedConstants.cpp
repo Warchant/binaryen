@@ -32,6 +32,8 @@
 // is a good last resort. As such, it will optimize if it made any changes.
 //
 
+// XXX now at right speed level on zlib, but size is not great.
+
 #include "wasm.h"
 #include "pass.h"
 #include "wasm-builder.h"
