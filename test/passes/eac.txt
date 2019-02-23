@@ -1,0 +1,75 @@
+(module
+ (type $0 (func (param i32)))
+ (func $good (; 0 ;) (type $0) (param $x0 i32)
+  (local $x1 i32)
+  (local $2 i32)
+  (local.set $x1
+   (i32.add
+    (local.tee $2
+     (local.get $x0)
+    )
+    (i32.const 28)
+   )
+  )
+  (drop
+   (i32.add
+    (local.get $2)
+    (i32.const 28)
+   )
+  )
+  (drop
+   (local.get $x1)
+  )
+ )
+ (func $tricky (; 1 ;) (type $0) (param $x0 i32)
+  (local $x1 i32)
+  (local $2 i32)
+  (local $3 i32)
+  (local.set $x1
+   (i32.add
+    (local.tee $2
+     (local.get $x0)
+    )
+    (i32.const 28)
+   )
+  )
+  (drop
+   (i32.add
+    (local.get $2)
+    (i32.const 28)
+   )
+  )
+  (local.set $x1
+   (i32.add
+    (local.tee $3
+     (local.get $x0)
+    )
+    (i32.const 32)
+   )
+  )
+  (drop
+   (i32.add
+    (local.get $3)
+    (i32.const 32)
+   )
+  )
+ )
+ (func $bad (; 2 ;) (type $0) (param $x0 i32)
+  (local $x1 i32)
+  (if
+   (i32.const 0)
+   (local.set $x1
+    (i32.add
+     (local.get $x0)
+     (i32.const 28)
+    )
+   )
+  )
+  (drop
+   (local.get $x1)
+  )
+  (drop
+   (local.get $x1)
+  )
+ )
+)

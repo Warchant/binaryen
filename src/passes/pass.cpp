@@ -166,9 +166,6 @@ void PassRunner::addDefaultFunctionOptimizationPasses() {
   if (options.optimizeLevel >= 2 || options.shrinkLevel >= 2) {
     add("pick-load-signs");
   }
-  if (options.optimizeLevel >= 3 && options.shrinkLevel == 0) {
-    add("eac");
-  }
   // early propagation
   if (options.optimizeLevel >= 3 || options.shrinkLevel >= 2) {
     add("precompute-propagate");
@@ -181,6 +178,9 @@ void PassRunner::addDefaultFunctionOptimizationPasses() {
   add("simplify-locals-nostructure"); // don't create if/block return values yet, as coalesce can remove copies that that could inhibit
   add("vacuum"); // previous pass creates garbage
   add("reorder-locals");
+  if (options.optimizeLevel >= 3 && options.shrinkLevel == 0) {
+    add("eac");
+  }
   add("remove-unused-brs"); // simplify-locals opens opportunities for optimizations
   // if we are willing to work hard, also optimize copies before coalescing
   if (options.optimizeLevel >= 3 || options.shrinkLevel >= 2) {

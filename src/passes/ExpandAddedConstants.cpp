@@ -20,7 +20,7 @@
 //
 //  x = y + 10
 //  z = x + 20
-//  w = x + 30
+//  w = load(x + 30)
 //
 // By expanding out x, we can merge those constants, and this is a pretty common
 // pattern. In particular, often big interpreter loops end up having many such
@@ -31,15 +31,12 @@
 #include "pass.h"
 #include "wasm-builder.h"
 #include "ir/local-graph.h"
-#include "ir/utils.h"
 
 namespace wasm {
 
-/*
-// Don't do this on small functions,
-static const Index MINIMUM_LOCALS = 20;
-static const Index MINIMUM_SIZE = 100;
-*/
+// Don't do this on small numbers of locals - the main benefit is when we can remove
+// an excessive number of temp locals with long lifetimes.
+static const Index MINIMUM_LOCALS = 100;
 
 struct ExpandAddedConstants : public WalkerPass<PostWalker<ExpandAddedConstants>> {
   bool isFunctionParallel() override { return true; }
@@ -47,12 +44,10 @@ struct ExpandAddedConstants : public WalkerPass<PostWalker<ExpandAddedConstants>
   Pass* create() override { return new ExpandAddedConstants; }
 
   void doWalkFunction(Function* func) {
-/*
-    if (func->getNumLocals() < MINIMUM_LOCALS ||
-        Measurer::measure(func->body) < MINIMUM_SIZE) {
+    if (func->getNumLocals() < MINIMUM_LOCALS) {
       return;
     }
-*/
+if (getenv("SKIP")) return;
     Builder builder(*getModule());
     LocalGraph localGraph(func);
     for (auto& pair : localGraph.getSetses) {
@@ -64,18 +59,17 @@ struct ExpandAddedConstants : public WalkerPass<PostWalker<ExpandAddedConstants>
           if (auto* binary = value->dynCast<Binary>()) {
             if (binary->op == AddInt32) {
               if (auto* parentGet = binary->left->dynCast<GetLocal>()) {
-                // The parent get must not be changed in between.
-                if (localGraph.getSetses[parentGet].size() == 1) {
-                  // It's enough to check for a constant on the right, since optimize-instructions
-                  // canonicalizes that way.
-                  if (auto* c = binary->right->dynCast<Const>()) {
-                    // Great, expand it out.
-                    *localGraph.locations[get] = builder.makeBinary(
-                      AddInt32,
-                      builder.makeGetLocal(parentGet->index, parentGet->type),
-                      builder.makeConst(c->value)
-                    );
-                  }
+                // It's enough to check for a constant on the right, since optimize-instructions
+                // canonicalizes that way.
+                if (auto* c = binary->right->dynCast<Const>()) {
+                  // Great, expand it out. Use a new temp local, which will be optimized away later.
+                  auto temp = Builder::addVar(func, parentGet->type);
+                  binary->left = builder.makeTeeLocal(temp, binary->left);
+                  *localGraph.locations[get] = builder.makeBinary(
+                    AddInt32,
+                    builder.makeGetLocal(temp, parentGet->type),
+                    builder.makeConst(c->value)
+                  );
                 }
               }
             }
